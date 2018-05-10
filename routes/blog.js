@@ -42,24 +42,24 @@ router.get('/:slug', (req, res) => {
         let authorName;
         if (req.session.user) {
             let userId = req.session.user.id; 
-            if (userId == post.userId){
+            if (userId === post.userId){
                 isUpdate = true;
-                authorName = req.session.user.username;
             } 
-        }else {
-            Users.findOne({where: {id: post.userId}}).then(user => {
-                authorName = user.username;
-            });
         }
+        Users.findOne({where: {id: post.userId}}).then(user => {
+            authorName = user.username;
+        });
         let listComment = new Array();
         Comments.findAll({where: {postId: post.id}}).then(comments => {
             comments.forEach(comment => {
                 Users.findOne({where: {id: comment.userId}}).then(user => {
                     item = new Array(user.username, comment.body);
                     listComment.push(item);
-                    res.render('detail', { title: slug, post: post, isLogin: isLogin, isUpdate: isUpdate, username: username, authorName: authorName, listComment: listComment });
                 });
-            })
+            });
+            setTimeout(()=>{
+                res.render('detail', { title: slug, post: post, isLogin: isLogin, isUpdate: isUpdate, username: username, authorName: authorName, listComment: listComment });
+            }, 100);
         });
     });      
 });
