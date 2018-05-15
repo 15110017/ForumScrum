@@ -20,19 +20,18 @@ router.post('/create',isAuthorized , (req, res) => {
         rating: 0
     };
     Posts.create(item).then(post => {
-        Posts.findOne({
-            where: {title: title}
-        }).then(post => {
-            res.redirect(`/blog/${post.slug}`)
-        });
+        //console.log(post.slug)
+        res.redirect(`/blog/${post.slug}`)
     })
 });
 router.get('/:slug', (req, res) => {
     let isLogin = false;
     let username = null;
+    let userId = 0;
     if (req.session.user){
         isLogin = true;
         username = req.session.user.username;
+        userId = req.session.user.id; 
     }
     let slug = req.params.slug
     Posts.findOne({
@@ -41,11 +40,11 @@ router.get('/:slug', (req, res) => {
         let isUpdate = false;
         let authorName;
         if (req.session.user) {
-            let userId = req.session.user.id; 
             if (userId === post.userId){
                 isUpdate = true;
             } 
         }
+        console.log(post.userId)
         Users.findOne({where: {id: post.userId}}).then(user => {
             authorName = user.username;
         });
@@ -59,7 +58,7 @@ router.get('/:slug', (req, res) => {
             });
             setTimeout(()=>{
                 res.render('detail', { title: slug, post: post, isLogin: isLogin, isUpdate: isUpdate, username: username, authorName: authorName, listComment: listComment });
-            }, 100);
+            }, 200);
         });
     });      
 });
@@ -117,5 +116,25 @@ router.post('/:slug/comment', isAuthorized, (req, res) => {
             res.redirect(`/blog/${post.slug}`)
         });
     });
+});
+router.post('/search', (req, res) => {
+    let search = req.body.search;
+    let isLogin = false;
+    let username = null;
+    if (req.session.user){
+        isLogin = true;
+        username = req.session.user.username;
+    }
+    Posts.findAll().then(posts => {
+        let searchPosts = new Array();
+        posts.forEach(post => {
+            if (post.title.includes(search))
+            searchPosts.push(post)
+        });
+        searchPosts.reverse();
+        return res.render('blog', { title: 'Blog', posts: searchPosts, isLogin: isLogin, username: username });
+    }).then(()=>{
+        return res.redirect(`/`);
+    })
 });
 module.exports = router;

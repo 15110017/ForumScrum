@@ -1,9 +1,9 @@
 const Sequelize = require('sequelize')
 
-const sequelize = new Sequelize('express', 'root', '1234', {
+const sequelize = new Sequelize('scrum', 'root', '123456', {
     host: 'localhost',
     dialect: 'mysql',
-    host: 3306
+    port: 3300
 });
 //test connect database
 sequelize.authenticate().then(() => {

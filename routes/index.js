@@ -11,6 +11,7 @@ router.get('/', function(req, res, next) {
     username = req.session.user.username;
   }
     Posts.findAll().then(posts => {
+        posts.reverse();
         res.render('blog', { title: 'Blog', posts: posts, isLogin: isLogin, username: username });
     })
 });
